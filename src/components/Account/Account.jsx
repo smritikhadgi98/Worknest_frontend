@@ -30,6 +30,8 @@ const Profile = () => {
   const [resumeName, setResumeName] = useState("");
   const { isAuthorized } = useContext(Context);
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // Modal state for delete confirmation
+
   useEffect(() => {
     if (isAuthorized) {
       fetchUserData();
@@ -174,8 +176,15 @@ const Profile = () => {
       }
     }
   };
-  
-  
+
+  const handleDeleteModal = () => {
+    setShowDeleteModal(true);  // Open the delete modal
+  };
+
+  const handleCloseModal = () => {
+    setShowDeleteModal(false);  // Close the modal without deleting
+  };
+
   if (!user) return <div>Loading...</div>;
 
   return (
@@ -207,27 +216,26 @@ const Profile = () => {
           {/* Edit/Delete Icons */}
           <div style={{ position: "absolute", top: "50px", right: "20px" }}>
             <div>
-            <FaEdit
-              onClick={() => setIsEditable(!isEditable)}
-              style={{
-                cursor: "pointer",
-                fontSize: "26px",
-                color: isEditable ? "#28a745" : "#555",
-                marginBottom: "50px",
-           
-              }}
-            />
+              <FaEdit
+                onClick={() => setIsEditable(!isEditable)}
+                style={{
+                  cursor: "pointer",
+                  fontSize: "26px",
+                  color: isEditable ? "#28a745" : "#555",
+                  marginBottom: "50px",
+                }}
+              />
             </div>
             <div>
-            <FaTrash
-              onClick={handleDelete}
-              style={{
-                cursor: "pointer",
-                fontSize: "26px",
-                color: "#dc3545",
-                marginBottom: "50px",
-              }}
-            />
+              <FaTrash
+                onClick={handleDeleteModal} // Open the modal instead of direct delete
+                style={{
+                  cursor: "pointer",
+                  fontSize: "26px",
+                  color: "#dc3545",
+                  marginBottom: "50px",
+                }}
+              />
             </div>
           </div>
 
@@ -421,31 +429,30 @@ const Profile = () => {
 
                 {/* Skills */}
                 <div style={{ display: "flex", alignItems: "center", marginBottom: "15px" }}>
-              <div
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  marginBottom: "20px",
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <FaPlus style={{ marginRight: "10px", color: "#555" }} />
-                <input
-                  type="text"
-                  name="skills"
-                  value={formData.skills}
-                  onChange={handleInputChange}
-                  placeholder=" Add Skills"
-                  style={{ flex: 1, border: "none", outline: "none" }}
-                  disabled={!isEditable}
-                />
-              </div>
-            </div>
+                  <div
+                    style={{
+                      padding: "10px",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      marginBottom: "20px",
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <FaPlus style={{ marginRight: "10px", color: "#555" }} />
+                    <input
+                      type="text"
+                      name="skills"
+                      value={formData.skills}
+                      onChange={handleInputChange}
+                      placeholder=" Add Skills"
+                      style={{ flex: 1, border: "none", outline: "none" }}
+                      disabled={!isEditable}
+                    />
+                  </div>
+                </div>
 
-                {/* Resume Upload */}
                 {/* Resume Upload */}
                 <div style={{ marginBottom: "20px" }}>
                   <h3 style={{ fontSize: "16px", marginBottom: "10px", color: "#333" }}>
@@ -453,14 +460,16 @@ const Profile = () => {
                   </h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                     {resumeName && (
-                      <div style={{ 
-                        padding: "10px", 
-                        backgroundColor: "#e9ecef",
-                        borderRadius: "4px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between"
-                      }}>
+                      <div
+                        style={{
+                          padding: "10px",
+                          backgroundColor: "#e9ecef",
+                          borderRadius: "4px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
                         <span>{resumeName}</span>
                       </div>
                     )}
@@ -484,14 +493,16 @@ const Profile = () => {
 
           {/* Save Button */}
           {isEditable && (
-            <div style={{ 
-              position: "absolute", 
-              bottom: "20px", 
-              left: "50%", 
-              transform: "translateX(-50%)",
-              display: "flex",
-              gap: "10px"
-            }}>
+            <div
+              style={{
+                position: "absolute",
+                bottom: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex",
+                gap: "10px",
+              }}
+            >
               <button
                 onClick={handleSubmit}
                 style={{
@@ -518,11 +529,72 @@ const Profile = () => {
               >
                 Cancel
               </button>
-              
             </div>
           )}
         </div>
       </div>
+
+      {/* Delete Modal */}
+      {/* Delete Modal */}
+{showDeleteModal && (
+  <div
+    style={{
+      position: "fixed",
+      top: "0",
+      left: "0",
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent black background
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: "9999", // Ensures the modal is on top of other content
+    }}
+  >
+    <div
+      style={{
+        backgroundColor: "#fff",
+        padding: "30px",
+        borderRadius: "8px",
+        width: "300px",
+        textAlign: "center",
+      }}
+    >
+      <h7>Are you sure you want to delete your account?</h7>
+ 
+      <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-evenly" }}>
+        <button
+          onClick={handleDelete}
+          style={{
+            backgroundColor: "#dc3545",
+            color: "#fff",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Yes, Delete
+        </button>
+        <button
+          onClick={handleCloseModal}
+          style={{
+            backgroundColor: "#6B961F",
+            color: "#fff",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+      )}
     </div>
   );
 };

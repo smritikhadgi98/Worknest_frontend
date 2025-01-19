@@ -9,6 +9,8 @@ const MyApplications = () => {
   const { user } = useContext(Context);
   const [applications, setApplications] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);  // State for delete confirmation modal
+  const [deleteId, setDeleteId] = useState(null);  // Track application to delete
   const [fileUrl, setFileUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const { isAuthorized } = useContext(Context);
@@ -36,18 +38,20 @@ const MyApplications = () => {
     }
   }, [isAuthorized, user, navigateTo]);
 
-  const deleteApplication = async (id) => {
+  const deleteApplication = async () => {
     try {
       const res = await axios.delete(
-        `http://localhost:4000/api/v1/application/delete/${id}`,
+        `http://localhost:4000/api/v1/application/delete/${deleteId}`,
         { withCredentials: true }
       );
       toast.success(res.data.message);
       setApplications((prevApplications) =>
-        prevApplications.filter((application) => application._id !== id)
+        prevApplications.filter((application) => application._id !== deleteId)
       );
+      setDeleteModalOpen(false);  // Close the delete confirmation modal after success
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete application");
+      setDeleteModalOpen(false);  // Close the modal even on error
     }
   };
 
@@ -59,6 +63,18 @@ const MyApplications = () => {
   const closeModal = () => {
     setModalOpen(false);
     setFileUrl("");
+  };
+
+  // Open delete confirmation modal
+  const openDeleteModal = (id) => {
+    setDeleteId(id);
+    setDeleteModalOpen(true);
+  };
+
+  // Close delete confirmation modal
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setDeleteId(null);
   };
 
   return (
@@ -100,13 +116,13 @@ const MyApplications = () => {
                     element={element}
                     key={element._id}
                     openModal={openModal}
-                    deleteApplication={deleteApplication}
+                    openDeleteModal={openDeleteModal}  // Pass openDeleteModal to EmployerCard
                   />
                 ) : (
                   <JobSeekerCard
                     element={element}
                     key={element._id}
-                    deleteApplication={deleteApplication}
+                    openDeleteModal={openDeleteModal}  // Pass openDeleteModal to JobSeekerCard
                   />
                 )
               )}
@@ -115,12 +131,70 @@ const MyApplications = () => {
         </div>
       </section>
 
-     {modalOpen && <ResumeModal fileUrl={fileUrl} onClose={closeModal} />}
+      {modalOpen && <ResumeModal fileUrl={fileUrl} onClose={closeModal} />}
+      
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: "9999",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "30px",
+              borderRadius: "8px",
+              width: "300px",
+              textAlign: "center",
+            }}
+          >
+            <h7>Are you sure you want to delete this application?</h7>
+            <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-evenly" }}>
+              <button
+                onClick={deleteApplication}
+                style={{
+                  backgroundColor: "#dc3545",
+                  color: "#fff",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={closeDeleteModal}
+                style={{
+                  backgroundColor: "#6B961F",
+                  color: "#fff",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const JobSeekerCard = ({ element, deleteApplication }) => {
+const JobSeekerCard = ({ element, openDeleteModal }) => {
   return (
     <div
       style={{
@@ -140,7 +214,7 @@ const JobSeekerCard = ({ element, deleteApplication }) => {
       <div style={{ flex: 2, textAlign: "left" }}>{element.status}</div>
       <div style={{ flex: 1, textAlign: "center" }}>
         <button
-          onClick={() => deleteApplication(element._id)}
+          onClick={() => openDeleteModal(element._id)}  // Open delete modal
           style={{
             backgroundColor: "#ff4d4f",
             color: "#fff",
@@ -161,31 +235,25 @@ const JobSeekerCard = ({ element, deleteApplication }) => {
   );
 };
 
-const EmployerCard = ({ element, openModal }) => {
-
+const EmployerCard = ({ element, openModal, openDeleteModal }) => {
   const [status, setStatus] = useState(element.status);
 
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value;
-  
     try {
-      // Optimistic update
       setStatus(newStatus);
-  
       const res = await axios.put(
         `http://localhost:4000/api/v1/application/update-status/${element._id}`,
         { status: newStatus },
         { withCredentials: true }
       );
-  
       toast.success(res.data.message);
     } catch (error) {
-      // Revert the status on error
       setStatus(element.status);
       toast.error(error.response?.data?.message || "Failed to update status");
     }
   };
-  
+
   return (
     <div
       style={{
@@ -253,7 +321,9 @@ const EmployerCard = ({ element, openModal }) => {
           <option value="Rejected">Rejected</option>
         </select>
       </div>
+    
 
+     
     </div>
   );
 };

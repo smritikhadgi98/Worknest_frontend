@@ -21,6 +21,7 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import Interviews from "./components/Interviews/Interviews";
 import ResetPassword from "./components/Auth/ResetPassword";
 import VideoCallPage from "./components/Interviews/VideoCall";
+import Faq from "./components/FAQs/Faq";
 
 
 const App = () => {
@@ -50,6 +51,7 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/faq" element={<Faq />} />
           <Route path="/video-call" element={<VideoCallPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />         
