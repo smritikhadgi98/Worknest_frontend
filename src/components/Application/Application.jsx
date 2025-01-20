@@ -13,6 +13,7 @@ const Application = () => {
   const [skills, setSkills] = useState("");
   const [resume, setResume] = useState(null);
   const [coverLetter, setCoverLetter] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { isAuthorized, user } = useContext(Context);
   const navigateTo = useNavigate();
@@ -30,6 +31,8 @@ const Application = () => {
       toast.error("Both Resume and Cover Letter are required.");
       return;
     }
+
+    setLoading(true);
 
     const formData = new FormData();
     formData.append("firstName", firstName);
@@ -55,6 +58,8 @@ const Application = () => {
       navigateTo("/job/getall");
     } catch (error) {
       toast.error(error.response?.data?.message || "Submission failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,32 +69,27 @@ const Application = () => {
 
   const styles = {
     container: {
-      marginLeft: "250px", /* Adjust this value to match your navbar width */
-  padding: "20px",
-  boxSizing: "border-box",
-  minWidth: "1000px",
-  minHeight: "700px",
-  borderRadius: "50px 0 0 50px",
-  backgroundColor: "#fff", /* Add rounded corner effect */
-
+      marginLeft: "250px",
+      padding: "20px",
+      boxSizing: "border-box",
+      minWidth: "1000px",
+      minHeight: "700px",
+      borderRadius: "50px 0 0 50px",
+      backgroundColor: "#fff",
     },
     heading: {
       fontSize: "28px",
       fontWeight: "bold",
       marginBottom: "20px",
-      textAlign:"center"
+      textAlign: "center",
     },
     form: {
       display: "flex",
       flexDirection: "column",
-     justifyContent:"center",
       gap: "20px",
-      width: "100%",
-     
       maxWidth: "900px",
-      maxHeight: "1200px",
       backgroundColor: "#f1f3f6",
-      marginLeft:"200px",
+      marginLeft: "200px",
       padding: "30px",
       borderRadius: "8px",
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
@@ -114,82 +114,109 @@ const Application = () => {
       border: "none",
       borderRadius: "4px",
       cursor: "pointer",
-      textAlign: "center",
     },
-  };
+    overlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 1000,
+    },
+    spinner: {
+      border: "6px solid #f3f3f3", // Light grey
+      borderRadius: "50%",
+      borderTop: "6px solid #4CAF50", // Green
+      width: "50px",
+      height: "50px",
+      animation: "spin 1s linear infinite", // Smooth spinning animation
+    },
+    blurred: {
+      filter: "blur(5px)",
+    },
   
+  
+  };
+
   return (
-    <div style={{ backgroundColor: '#C6D6C6', minHeight: '100vh' }}>
-    <section style={styles.container}>
-      <h1 style={styles.heading}>Application Form</h1>
-      <form onSubmit={handleApplication} style={styles.form}>
-        <div style={styles.row}>
+    <div style={{ backgroundColor: "#C6D6C6", minHeight: "100vh" }}>
+      {loading && (
+        <div style={styles.overlay}>
+          <div style={styles.spinner}></div>
+        </div>
+      )}
+      <section style={loading ? { ...styles.container, ...styles.blurred } : styles.container}>
+        <h1 style={styles.heading}>Application Form</h1>
+        <form onSubmit={handleApplication} style={styles.form}>
+          <div style={styles.row}>
+            <input
+              type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              style={styles.input}
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              style={styles.input}
+            />
+          </div>
+          <div style={styles.row}>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={styles.input}
+            />
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              style={styles.input}
+            />
+          </div>
           <input
             type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             style={styles.input}
           />
           <input
             type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            style={styles.input}
-          />
-        </div>
-        <div style={styles.row}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Skills"
+            value={skills}
+            onChange={(e) => setSkills(e.target.value)}
             style={styles.input}
           />
           <input
-            type="tel"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            type="file"
+            accept=".pdf,.docx"
+            onChange={(e) => handleFileChange(e, setCoverLetter)}
             style={styles.input}
           />
-        </div>
-        <input
-          type="text"
-          placeholder="Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          style={styles.input}
-        />
-        <input
-          type="text"
-          placeholder="Skills"
-          value={skills}
-          onChange={(e) => setSkills(e.target.value)}
-          style={styles.input}
-        />
-        <input
-          type="file"
-          accept=".pdf,.docx"
-          onChange={(e) => handleFileChange(e, setCoverLetter)}
-          style={styles.input}
-        />
-        <input
-          type="file"
-          accept=".pdf,.docx"
-          onChange={(e) => handleFileChange(e, setResume)}
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button}>
-          Send Application
-        </button>
-      </form>
-    </section>
+          <input
+            type="file"
+            accept=".pdf,.docx"
+            onChange={(e) => handleFileChange(e, setResume)}
+            style={styles.input}
+          />
+          <button type="submit" style={styles.button}>
+            Send Application
+          </button>
+        </form>
+      </section>
     </div>
   );
-  
- 
 };
 
 export default Application;

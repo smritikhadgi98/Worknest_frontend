@@ -118,7 +118,7 @@ const Login = () => {
             <span
               onClick={() => navigate("/forgot-password")}
               style={{
-                color: "#007bff",
+                color: "#666464",
                 cursor: "pointer",
                 fontSize: "0.9rem",
                 textDecoration: "underline",
