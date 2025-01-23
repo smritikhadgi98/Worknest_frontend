@@ -187,7 +187,13 @@ const Sidebar = () => {
       {!isHideSidebar && (
         <div style={styles.sidebar}>
           <div style={styles.logo}>
-            <img src="/logo.png" alt="WorkNest Logo" style={styles.logoImg} />
+            <Link
+              to="/job/getall"
+              style={{ textDecoration: "none" }}
+              onClick={() => setActiveItem("dashboard")}
+            >
+              <img src="/logo.png" alt="WorkNest Logo" style={styles.logoImg} />
+            </Link>
           </div>
           <ul style={styles.menu}>
             {/* Dashboard */}
@@ -200,7 +206,6 @@ const Sidebar = () => {
                 <BiGridAlt /> Dashboard
               </Link>
             </li>
-
             {/* Job Seeker Links */}
             {user?.role === "Job Seeker" && (
               <>
