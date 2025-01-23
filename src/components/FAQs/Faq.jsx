@@ -37,7 +37,7 @@ const Faq = () => {
       {
         question: " Can I edit a job posting after publishing?",
         answer:
-          " Yes! Go to “My Job Listings”, select the job, and click “Edit” to update details.",
+          " Yes! Go to “View Your Job”, select the job, and click “Edit” to update details.",
       },
   ];
 
@@ -123,7 +123,7 @@ const Faq = () => {
                   style={{
                     backgroundColor: "#F5F5F5",
                     padding: "18px 25px",
-                    fontSize: "1rem",
+                    fontSize: "0.6rem",
                     color: "#444",
                     borderTop: "1px solid #ddd",
                     animation: "slideDown 0.3s ease",

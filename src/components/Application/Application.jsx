@@ -138,8 +138,6 @@ const Application = () => {
     blurred: {
       filter: "blur(5px)",
     },
-  
-  
   };
 
   return (
@@ -198,14 +196,18 @@ const Application = () => {
             onChange={(e) => setSkills(e.target.value)}
             style={styles.input}
           />
+          <label>Upload Cover Letter:</label>
           <input
             type="file"
+            placeholder="Cover Letter"
             accept=".pdf,.docx"
             onChange={(e) => handleFileChange(e, setCoverLetter)}
             style={styles.input}
           />
+          <label>Upload Resume:</label>
           <input
             type="file"
+            placeholder="Resume Letter"
             accept=".pdf,.docx"
             onChange={(e) => handleFileChange(e, setResume)}
             style={styles.input}
